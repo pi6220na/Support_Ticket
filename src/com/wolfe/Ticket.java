@@ -4,17 +4,18 @@
 package com.wolfe;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.io.Serializable;
 
 import static com.wolfe.TicketManager.printAllTickets;
 
-public class Ticket {
+public class Ticket implements Serializable {
 
     private int priority;
     private String reporter; //Stores person or department who reported issue
     private String description;
     private Date dateReported;
+    private Date dateClosed;
+    private String resolution;
 
     //STATIC Counter - accessible to all Ticket objects.
     //If any Ticket object modifies this counter, all Ticket objects will have the modified value
@@ -33,6 +34,15 @@ public class Ticket {
         staticTicketIDCounter++;
     }
 
+    public static int getStaticTicketIDCounter() {
+        return staticTicketIDCounter;
+    }
+
+    public static void setStaticTicketIDCounter(int staticTicketIDCounter) {
+        System.out.println("in Ticket: set staticID = " + staticTicketIDCounter);
+        Ticket.staticTicketIDCounter = staticTicketIDCounter;
+    }
+
     public int getTicketID() {
         return ticketID;
     }
@@ -40,45 +50,36 @@ public class Ticket {
     protected int getPriority() {
         return priority;
     }
+    public Date getDateClosed() {
+        return dateClosed;
+    }
+
+    public void setDateClosed(Date dateClosed) {
+        this.dateClosed = dateClosed;
+    }
+
+    public String getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(String resolution) {
+        this.resolution = resolution;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String toString(){
-        return("ID= " + this.ticketID + " Issued: " + this.description + " Priority: "
-                + this.priority + " Reported by: "
-                + this.reporter + " Reported on: " + this.dateReported);
+        return("ID= " + this.ticketID + " Description: " + this.description + " Priority: "
+                + this.priority + " Reported by: "  + this.reporter + " Reported on: "
+                + this.dateReported  + " Date Closed: " + this.dateClosed + " Resolution: "
+                + this.resolution);
     }
-
-
-    protected static void deleteTicket(LinkedList<Ticket> ticketQueue) {
-        printAllTickets(ticketQueue);   //display list for user
-
-        if (ticketQueue.size() == 0) {    //no tickets!
-            System.out.println("No tickets to delete!\n");
-            return;
-        }
-
-        Scanner deleteScanner = new Scanner(System.in);
-        System.out.println("Enter ID of ticket to delete");
-        int deleteID = deleteScanner.nextInt();
-
-        //Loop over all tickets. Delete the one with this ticket ID
-        boolean found = false;
-        for (Ticket ticket : ticketQueue) {
-            if (ticket.getTicketID() == deleteID) {
-                found = true;
-                ticketQueue.remove(ticket);
-                System.out.println(String.format("Ticket %d deleted", deleteID));
-                break; //don't need loop any more.
-            }
-        }
-        if (found == false) {
-            System.out.println("Ticket ID not found, no ticket deleted");
-            //TODO – re-write this method to ask for ID again if not found
-        }
-
-        printAllTickets(ticketQueue);  //print updated list
-
-    }
-
 
 }
 
