@@ -4,10 +4,21 @@
   *
   *  Base code from Week 7 slides
   *
-  *  This program supports a support ticket application used by
+  *  This program supports a trouble ticket application used by
   *  a tech support person.
   *
-  *     TODO add more to description
+  *  - added code to support deleting a ticket by ID or issue
+  *  - added search description code
+  *  - updated class Ticket with resolution and date fields
+  *  - added a resolvedTicket queue to hold removed tickets
+  *  - added serialization option to class Ticket
+  *  - wrote read/write file routines
+  *  - incorporated saving static ticketID to file to facilitate
+  *    getting the next unique ticketID when starting the
+  *    program from a previous run.
+  *  - cleaned up the main menu
+  *  - added comments
+  *
  */
 package com.wolfe;
 
@@ -27,22 +38,13 @@ public class TicketManager {
 
         scanner = new Scanner(System.in);
 
+        // populate ticketQueue from saved file if it exists
         ticketQueue = readOpenTicket();
-        if (ticketQueue.size() != 0) {
-            updateTicketID(ticketQueue);
-        }
 
         boolean quit = false;
         while (!quit) {
 
-            System.out.println("1. Enter Ticket");
-            System.out.println("2. Delete Ticket by ID");
-            System.out.println("3. Delete Ticket by Issue");
-            System.out.println("4. Search by Name (description)");
-            System.out.println("5. Display Active Tickets");
-            System.out.println("6. Display Resolved Tickets");
-            System.out.println("7. Quit");
-            int task = getPositiveIntInput();
+            int task = displayMenu();
 
             switch (task) {
 
@@ -93,219 +95,32 @@ public class TicketManager {
                 }
 
                 default: {
-                    //this will happen for 3 or any other selection that is a valid int
-                    //TODO Program crashes if you enter anything else - please fix
                     //Default will be print all tickets
-                    printAllTickets(ticketQueue);
-                    System.out.println("Enter a number from the menu choices");
+                    System.out.println("Unknown entry, please try again");
+
                 }
             }
         }
         scanner.close();
     }
 
+    private static int displayMenu() {
+        System.out.println("Welcome to the Support Ticket Program");
+        System.out.println("   1. Enter Ticket");
+        System.out.println("   2. Delete Ticket by ID");
+        System.out.println("   3. Delete Ticket by Issue");
+        System.out.println("   4. Search by Name (description)");
+        System.out.println("   5. Display Active Tickets");
+        System.out.println("   6. Display Resolved Tickets");
+        System.out.println("   7. Quit");
+        System.out.println("Enter the number of the menu item desired:");
+        int task = getPositiveIntInput();
 
-    private static void printResolvedTickets(LinkedList<Ticket> resolvedTickets) {
-
-        System.out.println(" ------- All Resolved tickets ----------");
-
-        for (Ticket t : resolvedTickets) {
-            System.out.println(t); //Write a toString method in Ticket class
-            //println will try to call toString on its argument
-        }
-        System.out.println(" ------- End of ticket list ----------");
-
+        return task;
     }
 
-    // ask user for word to search Ticket Description on and display all
-    // tickets that contain that word
-    private static void searchByName(LinkedList<Ticket> ticketQueue) {
-
-        System.out.println("Please enter a word to search for in Ticket description: ");
-        String searchFor = getStringInput();
-
-        for (Ticket item : ticketQueue) {
-            String tempDesc = item.getDescription();
-            // System.out.println("searching item " + item.getTicketID() + " description: " + item.getDescription());
-            if (tempDesc.toLowerCase().contains(searchFor.toLowerCase())) {
-                System.out.println("Found: " + item);
-            }
-        }
-    }
-
-
-    private static void deleteTicketByIssue(LinkedList<Ticket> ticketQueue,
-                                            LinkedList<Ticket> resolvedQueue) {
-
-        searchByName(ticketQueue);
-        deleteTicketByID(ticketQueue, resolvedQueue);
-
-    }
-
-
-    private static void updateTicketID(LinkedList<Ticket> ticketQueue) {
-
-        /*
-        for (Ticket item : ticketQueue) {
-            if (item.getTicketID() > Ticket.getStaticTicketIDCounter()) {
-                Ticket.setStaticTicketIDCounter(item.getTicketID());
-            }
-        }
-        int bump = Ticket.getStaticTicketIDCounter();
-        Ticket.setStaticTicketIDCounter(++bump);
-        */
-
-    }
-
-    private static LinkedList<Ticket> readOpenTicket() {
-
-        LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
-
-        File f = new File("open_tickets.ser");
-        if(f.exists()) {
-            ObjectInputStream objectinputstream = null;
-            try {
-                FileInputStream streamIn = new FileInputStream("open_tickets.ser");
-                objectinputstream = new ObjectInputStream(streamIn);
-
-                int tempID = (int) objectinputstream.readObject();
-                System.out.println("in readOpenTicket. tempID = " + tempID);
-                Ticket.setStaticTicketIDCounter(tempID);
-
-                ticketQueue = (LinkedList<Ticket>) objectinputstream.readObject();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if(objectinputstream != null){
-                    try {
-                        objectinputstream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            printAllTickets(ticketQueue);
-            return ticketQueue;
-        } else {
-            ticketQueue = new LinkedList<Ticket>();
-            return ticketQueue;
-        }
-    }
-
-    // write ticketQueue list to file
-    private static void writeOpenTickets(LinkedList<Ticket> ticketQueue) {
-        // adapted from: http://stackoverflow.com/questions/17293991/how-to-write
-        // -and-read-java-serialized-objects-into-a-file
-        ObjectOutputStream oos = null;
-        FileOutputStream fout = null;
-        try{
-            //fout = new FileOutputStream("open_tickets.ser", true);
-            fout = new FileOutputStream("open_tickets.ser");
-            oos = new ObjectOutputStream(fout);
-
-            oos.writeObject(Ticket.getStaticTicketIDCounter());
-
-            oos.writeObject(ticketQueue);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if(oos  != null){
-                try {
-                    oos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private static void writeClosedTickets(LinkedList<Ticket> resolvedTickets) {
-
-        // jump out if no resolved tickets to write out
-        if (resolvedTickets.size() == 0) {
-            return;
-        }
-
-        // adapted from: http://stackoverflow.com/questions/17293991/how-to-write
-        // -and-read-java-serialized-objects-into-a-file
-        ObjectOutputStream oos = null;
-        FileOutputStream fout = null;
-        try{
-
-            // https://www.mkyong.com/java/java-how-to-get-current-date-time-date-and-calender/
-            DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
-            Date dateClose = new Date();
-            String f = "Resolved_tickets_as_of_" + dateFormat.format(dateClose);
-
-            System.out.println("resolved filename = " + f);
-            fout = new FileOutputStream(f, true);
-            oos = new ObjectOutputStream(fout);
-
-            oos.writeObject(resolvedTickets);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if(oos  != null){
-                try {
-                    oos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-
-
-    // original code moved from Ticket class
-    protected static void deleteTicketByID(LinkedList<Ticket> ticketQueue, LinkedList<Ticket> resolvedQueue) {
-
-        if (ticketQueue.size() == 0) {    //no tickets!
-            System.out.println("No tickets to delete!\n");
-            return;
-        }
-
-        System.out.println("Enter ID of ticket to delete");
-        int deleteID = TicketManager.getPositiveIntInput();
-
-        //Loop over all tickets. Delete the one with this ticket ID
-        boolean found = false;
-
-        Scanner sc = new Scanner(System.in);
-        Date dateClosed = new Date();
-
-        while (!found) {
-                for (Ticket ticket : ticketQueue) {
-                    if (ticket.getTicketID() == deleteID) {
-                        found = true;
-
-                        // update ticket with resolution info
-                        System.out.println("Enter the Ticket resolution:");
-                        String res = sc.nextLine();
-                        ticket.setResolution(res);
-                        ticket.setDateClosed(dateClosed);
-
-                        // remove ticket from active queue and move to resolved queue
-                        ticketQueue.remove(ticket);
-                        resolvedQueue.add(ticket);
-                        System.out.println(String.format("Ticket %d deleted", deleteID));
-                        break; //don't need loop any more.
-                    }
-                }
-                if (found == false) {
-                    System.out.println("Ticket ID not found");
-                    System.out.println("Enter ID of ticket to delete");
-                    deleteID = TicketManager.getPositiveIntInput();
-                }
-            } // end while
-
-        System.out.println("Updated ticket queue:");
-        printAllTickets(ticketQueue);  //print updated list
-
-    }
-
-    protected static void addTickets(LinkedList<Ticket> ticketQueue) {
+    // build a new ticket and add it the the LinkedList
+    private static void addTickets(LinkedList<Ticket> ticketQueue) {
         Scanner sc = new Scanner(System.in);
         boolean moreProblems = true;
         String description, reporter;
@@ -334,7 +149,197 @@ public class TicketManager {
         }
     }
 
-    protected static void addTicketInPriorityOrder(LinkedList<Ticket> tickets, Ticket newTicket){
+    // original code moved from Ticket class
+    private static void deleteTicketByID(LinkedList<Ticket> ticketQueue, LinkedList<Ticket> resolvedQueue) {
+
+        if (ticketQueue.size() == 0) {    //no tickets!
+            System.out.println("No tickets to delete!\n");
+            return;
+        }
+
+        System.out.println("Enter ID of ticket to delete");
+        int deleteID = TicketManager.getPositiveIntInput();
+
+        //Loop over all tickets. Delete the one with this ticket ID
+        boolean found = false;
+
+        Scanner sc = new Scanner(System.in);
+        Date dateClosed = new Date();
+
+        while (!found) {
+            for (Ticket ticket : ticketQueue) {
+                if (ticket.getTicketID() == deleteID) {
+                    found = true;
+
+                    // update ticket with resolution info
+                    System.out.println("Enter the Ticket resolution:");
+                    String res = sc.nextLine();
+                    ticket.setResolution(res);
+                    ticket.setDateClosed(dateClosed);
+
+                    // remove ticket from active queue and move to resolved queue
+                    ticketQueue.remove(ticket);
+                    resolvedQueue.add(ticket);
+                    System.out.println(String.format("Ticket %d deleted", deleteID));
+                    break; //don't need loop any more.
+                }
+            }
+            if (!found) {
+                System.out.println("Ticket ID not found");
+                System.out.println("Enter ID of ticket to delete");
+                deleteID = TicketManager.getPositiveIntInput();
+            }
+        } // end while
+
+        System.out.println("Updated ticket queue:");
+        printAllTickets(ticketQueue);  //print updated list
+
+    }
+
+
+    // let user choose which ticket they want to delete by searching the descriptions of open
+    // tickets. Then have the user select the ticket by ID for deletion.
+    private static void deleteTicketByIssue(LinkedList<Ticket> ticketQueue,
+                                            LinkedList<Ticket> resolvedQueue) {
+
+        searchByName(ticketQueue);
+        deleteTicketByID(ticketQueue, resolvedQueue);
+
+    }
+
+    // ask user for word to search Ticket Description on and display all
+    // tickets that contain that word
+    private static void searchByName(LinkedList<Ticket> ticketQueue) {
+
+        System.out.println("Please enter a word to search for in Ticket description: ");
+        String searchFor = getStringInput();
+
+        for (Ticket item : ticketQueue) {
+            String tempDesc = item.getDescription();
+            // System.out.println("searching item " + item.getTicketID() + " description: " + item.getDescription());
+            if (tempDesc.toLowerCase().contains(searchFor.toLowerCase())) {
+                System.out.println("Found: " + item);
+            }
+        }
+    }
+
+    // this method reads the saved (from last program execution) ticket data file
+    // and populates the LinkedLink object.
+    // Note that the first read gets an integer representing the next ticketID to use.
+    private static LinkedList<Ticket> readOpenTicket() {
+
+        LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
+
+        File f = new File("open_tickets.ser");
+        if(f.exists()) {
+            ObjectInputStream objectinputstream = null;
+            try {
+                FileInputStream streamIn = new FileInputStream("open_tickets.ser");
+                objectinputstream = new ObjectInputStream(streamIn);
+
+                // read and set the static ticketID first
+                int tempID = (int) objectinputstream.readObject();
+                // System.out.println("in readOpenTicket. tempID = " + tempID);
+                Ticket.setStaticTicketIDCounter(tempID);
+
+                // load the ticketQueue from serialized file object
+                // unchecked cast??? not sure what this means, will continue to research
+                ticketQueue = (LinkedList<Ticket>) objectinputstream.readObject();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if(objectinputstream != null){
+                    try {
+                        objectinputstream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            printAllTickets(ticketQueue);
+            return ticketQueue;
+        } else {
+            // if no saved tickets on file, create an empty LinketLink
+            ticketQueue = new LinkedList<Ticket>();
+            return ticketQueue;
+        }
+    }
+
+    // write ticketQueue list to file
+    private static void writeOpenTickets(LinkedList<Ticket> ticketQueue) {
+        // adapted from: http://stackoverflow.com/questions/17293991/how-to-write
+        // -and-read-java-serialized-objects-into-a-file
+        ObjectOutputStream oos = null;
+        FileOutputStream fout = null;
+        try{
+            //fout = new FileOutputStream("open_tickets.ser", true);
+            fout = new FileOutputStream("open_tickets.ser");
+            oos = new ObjectOutputStream(fout);
+
+            // save the current static ticketID
+            oos.writeObject(Ticket.getStaticTicketIDCounter());
+
+            // write out a serialized ticketQueue
+            oos.writeObject(ticketQueue);
+            System.out.println("Saving ticket information to file \"open_tickets.ser\"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(oos  != null){
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    // write out resolved tickets to a resolved ticket file with the file name appended with the current
+    // date. Data will be appended to the file for multiple program executions on the same day.
+    private static void writeClosedTickets(LinkedList<Ticket> resolvedTickets) {
+
+        // jump out if no resolved tickets to write out
+        if (resolvedTickets.size() == 0) {
+            return;
+        }
+
+        // adapted from: http://stackoverflow.com/questions/17293991/how-to-write
+        // -and-read-java-serialized-objects-into-a-file
+        ObjectOutputStream oos = null;
+        FileOutputStream fout = null;
+        try{
+
+            // https://www.mkyong.com/java/java-how-to-get-current-date-time-date-and-calender/
+            DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+            Date dateClose = new Date();
+            String f = "Resolved_tickets_as_of_" + dateFormat.format(dateClose);
+
+            // System.out.println("resolved filename = " + f);
+            fout = new FileOutputStream(f, true);
+            oos = new ObjectOutputStream(fout);
+
+            oos.writeObject(resolvedTickets);
+            System.out.println("Saving resolved ticket information to file \"Resolved_tickets....ser\"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(oos  != null){
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+
+    // this routine "sorts" the tickets into priority order - priority 5 is the most critical and first in
+    // line to be pulled from the LinkedLink
+    private static void addTicketInPriorityOrder(LinkedList<Ticket> tickets, Ticket newTicket){
 
         //Logic: assume the list is either empty or sorted
 
@@ -363,7 +368,7 @@ public class TicketManager {
     }
 
 
-    protected static void printAllTickets(LinkedList<Ticket> tickets) {
+    private static void printAllTickets(LinkedList<Ticket> tickets) {
         System.out.println(" ------- All open tickets ----------");
 
         for (Ticket t : tickets ) {
@@ -374,9 +379,23 @@ public class TicketManager {
 
     }
 
-    //Validation methods copied from ??? TODO figure out where this came from
+    private static void printResolvedTickets(LinkedList<Ticket> resolvedTickets) {
 
-    protected static int getPositiveIntInput() {
+        System.out.println(" ------- All Resolved tickets ----------");
+
+        for (Ticket t : resolvedTickets) {
+            System.out.println(t); //Write a toString method in Ticket class
+            //println will try to call toString on its argument
+        }
+        System.out.println(" ------- End of ticket list ----------");
+
+    }
+
+
+
+    //Validation methods copied from one of my earlier programs.
+
+    private static int getPositiveIntInput() {
 
         while (true) {
             try {
@@ -386,7 +405,6 @@ public class TicketManager {
                     return intInput;
                 } else {
                     System.out.println("Please enter a positive number");
-                    continue;
                 }
             } catch (NumberFormatException ime) {
                 System.out.println("Please type a positive number");
@@ -395,7 +413,7 @@ public class TicketManager {
 
     }
 
-    protected static double getPositiveDoubleInput() {
+    private static double getPositiveDoubleInput() {
 
         while (true) {
             try {
@@ -405,7 +423,6 @@ public class TicketManager {
                     return doubleInput;
                 } else {
                     System.out.println("Please enter a positive number");
-                    continue;
                 }
             } catch (NumberFormatException ime) {
                 System.out.println("Please type a positive number");
@@ -414,13 +431,13 @@ public class TicketManager {
 
     }
 
-    protected static String getStringInput() {
+    private static String getStringInput() {
 
         String entry = scanner.nextLine();
         return entry;
 
     }
 
-}
+} // end class TicketManager
 
 

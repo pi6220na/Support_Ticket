@@ -1,12 +1,15 @@
 /**
  * Created by Jeremy on 10/5/2016.
+ * Implements Serializable - an interface (perhaps considered an Abstract class). This allows the object
+ * to be flattened into a byte stream that can be transmitted over a wire or locally.
+ * Used in TicketManager to save LinkedList queues (in their entirety) to disk file.
+ *
+ * This class contains data for a support trouble ticket for use by a tech support person.
  */
 package com.wolfe;
 
 import java.util.Date;
 import java.io.Serializable;
-
-import static com.wolfe.TicketManager.printAllTickets;
 
 public class Ticket implements Serializable {
 
@@ -39,7 +42,7 @@ public class Ticket implements Serializable {
     }
 
     public static void setStaticTicketIDCounter(int staticTicketIDCounter) {
-        System.out.println("in Ticket: set staticID = " + staticTicketIDCounter);
+        // System.out.println("in Ticket: set staticID = " + staticTicketIDCounter);
         Ticket.staticTicketIDCounter = staticTicketIDCounter;
     }
 
