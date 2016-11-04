@@ -28,6 +28,17 @@ public class Ticket implements Serializable {
     //The ID for each ticket - instance variable. Each Ticket will have it's own ticketID variable
     protected int ticketID;
 
+
+
+    public Ticket(String desc, int p, String rep, Date date) {
+        this.description = desc;
+        this.priority = p;
+        this.reporter = rep;
+        this.dateReported = date;
+        this.ticketID = staticTicketIDCounter;
+        staticTicketIDCounter++;
+    }
+
     public String getReporter() {
         return reporter;
     }
@@ -44,14 +55,6 @@ public class Ticket implements Serializable {
         this.dateReported = dateReported;
     }
 
-    public Ticket(String desc, int p, String rep, Date date) {
-        this.description = desc;
-        this.priority = p;
-        this.reporter = rep;
-        this.dateReported = date;
-        this.ticketID = staticTicketIDCounter;
-        staticTicketIDCounter++;
-    }
 
     public static int getStaticTicketIDCounter() {
         return staticTicketIDCounter;

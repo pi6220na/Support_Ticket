@@ -1,9 +1,11 @@
 package com.wolfe;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -39,7 +41,9 @@ public class TicketForm extends JFrame {
         openTicketVector = TicketManager.getOpenTickets();    // Read all data from a file
 
         setContentPane(rootPanel);
+        setPreferredSize(new Dimension(1000, 600));   //Set preferred size before call to pack()
         pack();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
         configureCombo();
@@ -67,6 +71,22 @@ public class TicketForm extends JFrame {
         });
 
 
+        addTicketButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int priorInput = (Integer) priorityCB.getSelectedItem();   // cast is bad... need alternative
+                String reportInput = reporterTF.getText();
+                String descripInput = descriptionTF.getText();
+                Date dateOpened = new Date();
+
+                Ticket t = new Ticket(descripInput, priorInput, reportInput, dateOpened);
+
+                openTicketVector.add(t);
+
+                openTicketTableModel.fireTableDataChanged();
+            }
+        });
     }
 
     private void configureCombo() {
