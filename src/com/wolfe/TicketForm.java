@@ -1,11 +1,15 @@
 package com.wolfe;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.util.Vector;
 
 /**
  * Created by myrlin on 11/1/2016.
  */
-public class TicketForm {
+public class TicketForm extends JFrame {
     private JPanel rootPanel;
     private JTable resolvedTicket;
     private JTable openTicket;
@@ -17,7 +21,60 @@ public class TicketForm {
     private JButton addTicketButton;
     private JComboBox priorityCB;
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
+
+    Vector<Ticket> openTicketVector;
+    Vector<Ticket> resolvedTicketVector;
+
+
+    //Models for the JComboBox and JTables.
+    OpenTicketTableModel openTicketTableModel;
+    ResolvedTicketTableModel resolvedTicketTableModel;
+    DefaultComboBoxModel<Integer> priorityCBComboModel;
+
+
+    public TicketForm() {
+
+        super("Trouble App");
+
+        openTicketVector = TicketManager.getOpenTickets();    // Read all data from a file
+
+        setContentPane(rootPanel);
+        pack();
+        setVisible(true);
+
+        configureCombo();
+
+
+        // Create model for best times JTable
+        openTicketTableModel = new OpenTicketTableModel(openTicketVector);   //Provide Vector of Open Tickets
+
+        //Configure each component to use its model
+        openTicket.setModel(openTicketTableModel);
+
+
+        Integer[] priority = { 1,2,3,4,5 };
+
+        JComboBox<Integer> prior = new JComboBox<Integer>(priority);
+//        prior.addActionListener(this);
+
+
+        priorityCB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                prior.addActionListener(this);
+
+            }
+        });
+
+
     }
+
+    private void configureCombo() {
+
+        for (int x = 1 ; x <= 5 ; x++ ) {
+                priorityCB.addItem(x);
+        }
+
+    }
+
 }

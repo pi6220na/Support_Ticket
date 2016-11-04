@@ -29,9 +29,12 @@ import java.util.*;
 
 public class TicketManager {
 
+    static LinkedList<Ticket> ticketQueue;
+    static LinkedList<Ticket> resolvedTickets = new LinkedList<Ticket>();
+
     private static Scanner scanner;   //Global scanner used for all input
 
-    public static void main(String[] args) {
+    public static void oldmain() {
 
         LinkedList<Ticket> ticketQueue;
         LinkedList<Ticket> resolvedTickets = new LinkedList<Ticket>();
@@ -265,6 +268,39 @@ public class TicketManager {
             return ticketQueue;
         }
     }
+
+    // ******* convert ticketQueue to Vector *************
+    static Vector<Ticket> getOpenTickets() {
+
+        ticketQueue = readOpenTicket();
+
+
+        Vector<Ticket> tickets = new Vector<>();
+
+        /*
+        for (int j = 0; j < ticketQueue.size(); j++) {
+
+            Ticket t = ticketQueue.get(j);
+            tickets.add(t);
+
+        }
+        */
+
+        Date dateClosed = new Date();
+        Ticket t = new Ticket("Bad Internet",1,"The BOSS",dateClosed);
+        tickets.add(t);
+        Ticket z = new Ticket("Bad Network",5,"The Kid",dateClosed);
+        tickets.add(z);
+
+        return tickets;
+    }
+
+
+
+
+
+
+
 
     // write ticketQueue list to file
     private static void writeOpenTickets(LinkedList<Ticket> ticketQueue) {
