@@ -1,6 +1,7 @@
 package com.wolfe;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +47,7 @@ public class TicketForm extends JFrame {
         setContentPane(rootPanel);
         setPreferredSize(new Dimension(1000, 600));   //Set preferred size before call to pack()
         pack();
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
 
         configureCombo();
@@ -63,12 +64,26 @@ public class TicketForm extends JFrame {
         resolvedTicket.setModel(resolvedTicketTableModel);
 
 
+        // set column width JTables first two columns... doesn't seem to be working
+        openTicket.getColumnModel().getColumn(0).setPreferredWidth(10);
+        openTicket.getColumnModel().getColumn(1).setPreferredWidth(10);
+        resolvedTicket.getColumnModel().getColumn(0).setPreferredWidth(10);
+        resolvedTicket.getColumnModel().getColumn(1).setPreferredWidth(10);
 
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+        openTicket.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+        openTicket.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+        resolvedTicket.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+        resolvedTicket.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
 
         Integer[] priority = { 1,2,3,4,5 };
 
         JComboBox<Integer> prior = new JComboBox<Integer>(priority);
 //        prior.addActionListener(this);
+
+
+        // listeners here
 
 
         priorityCB.addActionListener(new ActionListener() {
@@ -131,12 +146,39 @@ public class TicketForm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                // Clara's code from Lake GUI program
+                if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(TicketForm.this, "Are you sure you want to save and exit?", "Exit?", JOptionPane.OK_CANCEL_OPTION)) {
+
+                    TicketManager.writeTickets(openTicketVector, resolvedTicketVector);
+
+                    //http://stackoverflow.com/questions/258099/how-to-close-a-java-swing-application-from-the-code
+                    Container frame = quitButton.getParent();
+                    do
+                        frame = frame.getParent();
+                    while (!(frame instanceof JFrame));
+                    ((JFrame) frame).dispose();
+
+                    System.exit(0);
+
+                }
+
+            }
+        });
+
+        // close app and window from exit "X" button on window title bar
+        //https://www.clear.rice.edu/comp310/JavaResources/frame_close.html
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+
                 TicketManager.writeTickets(openTicketVector, resolvedTicketVector);
                 System.exit(0);
 
             }
         });
-    } //end Ticketform Class
+
+
+
+} //end Ticketform Class
 
     private void configureCombo() {
 
