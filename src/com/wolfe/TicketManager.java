@@ -22,6 +22,7 @@
  */
 package com.wolfe;
 
+import javax.swing.*;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -277,20 +278,21 @@ public class TicketManager {
 
         Vector<Ticket> tickets = new Vector<>();
 
-        /*
+
         for (int j = 0; j < ticketQueue.size(); j++) {
 
             Ticket t = ticketQueue.get(j);
             tickets.add(t);
 
         }
-        */
 
+/*
         Date dateClosed = new Date();
         Ticket t = new Ticket("Bad Internet",1,"The BOSS",dateClosed);
         tickets.add(t);
         Ticket z = new Ticket("Bad Network",5,"The Kid",dateClosed);
         tickets.add(z);
+*/
 
         return tickets;
     }
@@ -298,6 +300,34 @@ public class TicketManager {
 
 
 
+
+    // ******* convert vectors to ticketQueues  *************
+    static void writeTickets(Vector<Ticket> openTicketV, Vector<Ticket> resolvedTicketV) {
+
+        ticketQueue.clear();
+        resolvedTickets.clear();
+
+        for (int i = 0; i < openTicketV.size(); i++) {
+
+            Ticket t = openTicketV.get(i);
+            ticketQueue.add(t);
+            System.out.println("added ticket to open queue = " + t);
+
+        }
+
+        for (int i = 0; i < resolvedTicketV.size(); i++) {
+
+            Ticket t = resolvedTicketV.get(i);
+            resolvedTickets.add(t);
+            System.out.println("added ticket to resolved queue = " + t);
+
+        }
+
+
+        writeOpenTickets(ticketQueue);
+        writeClosedTickets(resolvedTickets);
+
+    }
 
 
 
