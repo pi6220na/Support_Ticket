@@ -5,14 +5,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 import java.util.Date;
 import java.util.Vector;
 
 /**
  * Created by myrlin on 11/1/2016.
  */
-public class TicketForm extends JFrame {
+public class TicketGUI extends JFrame {
     private JPanel rootPanel;
     private JTable resolvedTicket;
     private JTable openTicket;
@@ -37,11 +36,11 @@ public class TicketForm extends JFrame {
     DefaultComboBoxModel<Integer> priorityCBComboModel;
 
 
-    public TicketForm() {
+    public TicketGUI() {
 
         super("Trouble App");
 
-        openTicketVector = TicketManager.getOpenTickets();    // Read all data from a file
+        openTicketVector = TicketIO.getOpenTickets();    // Read all data from a file
         resolvedTicketVector = new Vector<>();
 
         setContentPane(rootPanel);
@@ -147,9 +146,9 @@ public class TicketForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 // Clara's code from Lake GUI program
-                if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(TicketForm.this, "Are you sure you want to save and exit?", "Exit?", JOptionPane.OK_CANCEL_OPTION)) {
+                if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(TicketGUI.this, "Are you sure you want to save and exit?", "Exit?", JOptionPane.OK_CANCEL_OPTION)) {
 
-                    TicketManager.writeTickets(openTicketVector, resolvedTicketVector);
+                    TicketIO.writeTickets(openTicketVector, resolvedTicketVector);
 
                     //http://stackoverflow.com/questions/258099/how-to-close-a-java-swing-application-from-the-code
                     Container frame = quitButton.getParent();
@@ -170,7 +169,7 @@ public class TicketForm extends JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
 
-                TicketManager.writeTickets(openTicketVector, resolvedTicketVector);
+                TicketIO.writeTickets(openTicketVector, resolvedTicketVector);
                 System.exit(0);
 
             }
