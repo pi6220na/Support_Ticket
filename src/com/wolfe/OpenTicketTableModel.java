@@ -4,7 +4,8 @@ import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 
 /**
- * Created by myrlin on 11/3/2016.
+ *
+ * Created by Jeremy on 11/3/2016.
  */
 public class OpenTicketTableModel extends AbstractTableModel {
 

@@ -1,7 +1,9 @@
 package com.wolfe;
 
 /**
- * Created by myrlin on 11/3/2016.
+ *  Lab 9 - Support Ticket GUI
+ *
+ *  Created by Jeremy on 11/3/2016.
  */
 public class Main {
 

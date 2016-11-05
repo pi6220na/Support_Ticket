@@ -1,5 +1,5 @@
 /*
- *
+ *  Lab 9 - Support Ticket GUI
  *
  *
  *   This IO module was adapted from:

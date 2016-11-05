@@ -9,7 +9,8 @@ import java.util.Date;
 import java.util.Vector;
 
 /**
- * Created by myrlin on 11/1/2016.
+ *
+ * Created by Jeremy on 11/1/2016.
  */
 public class TicketGUI extends JFrame {
     private JPanel rootPanel;
