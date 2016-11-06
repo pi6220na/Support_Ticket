@@ -5,6 +5,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.MouseAdapter;
 import java.util.Date;
 import java.util.Vector;
 
@@ -25,6 +27,8 @@ public class TicketGUI extends JFrame {
     private JComboBox priorityCB;
     private JButton quitButton;
     private JTextField resolutionTextField;
+//    private JScrollPane openTicketPane;
+//    private JScrollPane resolvedTicketPane;
 
 
     Vector<Ticket> openTicketVector;
@@ -53,7 +57,6 @@ public class TicketGUI extends JFrame {
         configureCombo();
 
 
-
         // Create model for JTables
         openTicketTableModel = new OpenTicketTableModel(openTicketVector);   //Provide Vector of Open Tickets
         resolvedTicketTableModel = new ResolvedTicketTableModel(resolvedTicketVector);
@@ -65,17 +68,20 @@ public class TicketGUI extends JFrame {
 
 
         // set column width JTables first two columns... doesn't seem to be working
-        openTicket.getColumnModel().getColumn(0).setPreferredWidth(10);
-        openTicket.getColumnModel().getColumn(1).setPreferredWidth(10);
-        resolvedTicket.getColumnModel().getColumn(0).setPreferredWidth(10);
-        resolvedTicket.getColumnModel().getColumn(1).setPreferredWidth(10);
+        openTicket.getColumnModel().getColumn(0).setPreferredWidth(35);
+        openTicket.getColumnModel().getColumn(1).setPreferredWidth(35);
 
+        resolvedTicket.getColumnModel().getColumn(0).setPreferredWidth(35);
+        resolvedTicket.getColumnModel().getColumn(1).setPreferredWidth(35);
+
+        // center data in first two table columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
         openTicket.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
         openTicket.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
         resolvedTicket.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
         resolvedTicket.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+
 
         Integer[] priority = { 1,2,3,4,5 };
 
@@ -99,18 +105,30 @@ public class TicketGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                // add a new ticket after validating reporter name and description entered
                 int priorInput = (Integer) priorityCB.getSelectedItem();   // cast is bad... need alternative
                 String reportInput = reporterTF.getText();
-                reporterTF.setText("");
-                String descripInput = descriptionTF.getText();
-                descriptionTF.setText("");
-                Date dateOpened = new Date();
+                // Validation. Make sure user has entered a name.
+                if (reportInput == null || reportInput.length() == 0) {
+                    JOptionPane.showMessageDialog(TicketGUI.this, "Please enter a reporter name before adding ticket");
+                    return;
+                }
 
+                String descripInput = descriptionTF.getText();
+                if (descripInput == null || descripInput.length() == 0) {
+                    JOptionPane.showMessageDialog(TicketGUI.this, "Please enter a description before adding ticket");
+                    return;
+                }
+
+                Date dateOpened = new Date();
                 Ticket t = new Ticket(descripInput, priorInput, reportInput, dateOpened);
 
-                openTicketVector.add(t);
+                reporterTF.setText("");
+                descriptionTF.setText("");
 
+                openTicketVector.add(t);
                 openTicketTableModel.fireTableDataChanged();
+
             }
         });
 
@@ -119,24 +137,33 @@ public class TicketGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                // get selected row to be deleted and validate a resolution was entered
                 int row = openTicket.getSelectedRow();
+                System.out.println("deleting: row = " + row);
+                if (row <= 0) {
+                    JOptionPane.showMessageDialog(TicketGUI.this, "Please select a ticket before deleting");
+                    return;
+                }
                 Ticket t = openTicketVector.get(row);
 
-                // TODO code for getting resolution from user goes here
-
                 String resolu = resolutionTextField.getText();
-                resolutionTextField.setText("");
+                if (resolu == null || resolu.length() == 0) {
+                    JOptionPane.showMessageDialog(TicketGUI.this, "Please enter a resolution before deleting ticket");
+                    return;
+                }
 
-                System.out.println("resolutionTextField = " + resolu);
+                // add deleted ticket to resolvedticketvector
                 t.setResolution(resolu);
                 t.setDateClosed(new Date());
-
                 resolvedTicketVector.add(t);
 
+                // delete ticket from open ticket vector
                 openTicketVector.remove(row);
 
                 openTicketTableModel.fireTableDataChanged();
                 resolvedTicketTableModel.fireTableDataChanged();
+
+                resolutionTextField.setText("");
 
             }
         });
@@ -161,9 +188,9 @@ public class TicketGUI extends JFrame {
                     System.exit(0);
 
                 }
-
             }
         });
+
 
         // close app and window from exit "X" button on window title bar
         //https://www.clear.rice.edu/comp310/JavaResources/frame_close.html
@@ -178,7 +205,8 @@ public class TicketGUI extends JFrame {
 
 
 
-} //end Ticketform Class
+
+    } //end Ticketform Class
 
     private void configureCombo() {
 
