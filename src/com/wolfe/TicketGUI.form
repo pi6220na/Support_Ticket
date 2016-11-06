@@ -29,7 +29,7 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Description"/>
+          <text value="Description:"/>
         </properties>
       </component>
       <component id="9d976" class="javax.swing.JLabel">
@@ -37,7 +37,7 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Reporter"/>
+          <text value="Reporter:"/>
         </properties>
       </component>
       <component id="dc9a9" class="javax.swing.JLabel">
@@ -104,7 +104,7 @@
           <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Resolution for selected open ticket"/>
+          <text value="Resolution for selected open ticket:"/>
         </properties>
       </component>
       <component id="8260c" class="javax.swing.JTextField" binding="resolutionTextField">
@@ -117,7 +117,7 @@
       </component>
       <component id="617f6" class="javax.swing.JTextField" binding="openTicketsTextField" default-binding="true">
         <constraints>
-          <grid row="5" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="5" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
@@ -128,7 +128,7 @@
       </component>
       <component id="60711" class="javax.swing.JTextField" binding="resolvedTicketsTextField" default-binding="true">
         <constraints>
-          <grid row="7" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="7" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>

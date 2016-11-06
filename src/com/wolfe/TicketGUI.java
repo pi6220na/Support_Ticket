@@ -140,7 +140,7 @@ public class TicketGUI extends JFrame {
                 // get selected row to be deleted and validate a resolution was entered
                 int row = openTicket.getSelectedRow();
                 System.out.println("deleting: row = " + row);
-                if (row <= 0) {
+                if (row < 0) {
                     JOptionPane.showMessageDialog(TicketGUI.this, "Please select a ticket before deleting");
                     return;
                 }
